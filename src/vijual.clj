@@ -1,12 +1,28 @@
 (ns vijual
-  (:use clojure.contrib.math)
-  (:use clojure.contrib.seq-utils)
+  (:require
+    [clojure.math.numeric-tower :refer [ceil floor]])
   (:import (java.io File)
            (javax.imageio ImageIO)
            (java.awt Color)
            (java.awt.image BufferedImage)))
 
 ;;Maintained By Conrad Barski- Licensed under GPLV3
+
+;; From clojure.contrib
+
+(defn indexed
+  "Returns a lazy sequence of [index, item] pairs, where items come
+  from 's' and indexes count up from zero.
+  (indexed '(a b c d))  =>  ([0 a] [1 b] [2 c] [3 d])"
+  [s]
+  (map vector (iterate inc 0) s))
+
+(defn positions
+  "Returns a lazy sequence containing the positions at which pred
+   is true for items in coll."
+  [pred coll]
+  (for [[idx elt] (indexed coll) :when (pred elt)] idx))
+
 
 ;; Common functions to all layout algorithms
 
@@ -488,11 +504,13 @@
 (defn shuffle-nodes
   "Randomly swaps two nodes of the graph"
   [pos nodes]
-  (let [a (rand-elt nodes)
-        b (rand-elt nodes)
+  (let [;a (rand-elt nodes)
+        ;b (rand-elt nodes)
+        [a b] (take 2 (shuffle nodes))
         an (pos a)
         bn (pos b)]
-    (merge pos 
+
+    (merge pos
            {a (assoc an :x (bn :x) :y (bn :y))
             b (assoc bn :x (an :x) :y (an :y))})))
 
